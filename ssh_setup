@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+ssh-keygen -t rsa
+
+echo "Enter the username of the Raspberry Pi:"
+
+read username_pi
+
+echo "Enter the IP Address of the Raspberry Pi:"
+
+read ip_pi
+
+if ssh $username_pi@$ip_pi "[ ! -e ~/.ssh ]"; then
+  echo "Directory doesn't exist"
+  ssh $username_pi@$ip_pi "mkdir ~/.ssh && chmod -R 600 ~/.ssh && chmod 700 ~/.ssh"
+else
+  echo "Directory does exist"
+fi
+
+if ssh $username_pi@$ip_pi "[ ! -e ~/.ssh/authorized_keys ]"; then
+  echo "File doesn't exist"
+  scp ~/.ssh/id_rsa.pub $username_pi@$ip_pi:~/.ssh/authorized_keys
+else
+  echo "File does exist"
+  cat ~/.ssh/id_rsa.pub | ssh $username_pi@$ip_pi "cat >> ~/.ssh/authorized_keys"
+fi
